@@ -270,6 +270,7 @@
             }
             
             draw();
+            if (frameCount > 10000) frameCount = 0;
             requestAnimationFrame(gameLoop);
         }
 
@@ -328,6 +329,7 @@
     </script>
 </body>
 </html>
+
 
 
 
