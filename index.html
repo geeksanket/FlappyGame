@@ -88,11 +88,43 @@
             background: #3da5af;
             transform: scale(1.05);
         }
-    </style>
+    .music-select {
+    margin-top: 10px;
+    color: white;
+    font-size: 18px;
+    text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
+}
+
+.music-select select {
+    padding: 8px 15px;
+    font-size: 16px;
+    border-radius: 8px;
+    border: none;
+    outline: none;
+    background: #4ec0ca;
+    color: white;
+    font-weight: bold;
+    cursor: pointer;
+    transition: 0.3s;
+}
+
+.music-select select:hover {
+    background: #3da5af;
+}
+</style>
 </head>
 <body>
+     
     <div class="game-container">
-        <div class="score">Score: <span id="score">0</span></div>
+        <div class="score">Score: <span id="score">0</span>
+        </div><div class="music-select">
+    <label for="music">🎵 Choose Music:</label>
+    <select id="music">
+        <option value="narendrabg.mp3">Narendra Theme</option>
+        <option value="selMusic1.mp3">Music1</option>
+        <option value="selMusic2">Music2</option>
+    </select>
+</div>
         <canvas id="gameCanvas" width="400" height="600"></canvas>
         <div class="instructions">
             Press SPACE or Click to Flap!
@@ -108,14 +140,30 @@
     <script>
         const canvas = document.getElementById('gameCanvas');
         const ctx = canvas.getContext('2d');
+        const birdImg = new Image();
+        birdImg.src = 'modibird.png';
+
         const scoreDisplay = document.getElementById('score');
         const gameOverDiv = document.getElementById('gameOver');
         const finalScoreDisplay = document.getElementById('finalScore');
         const highScoreDisplay = document.getElementById('highScore');
 
-        const bgMusic = new Audio('narendrabg.mp3');
+        const musicSelector = document.getElementById('music');
+        let bgMusic = new Audio(musicSelector.value);
         bgMusic.loop = true;
         bgMusic.volume = 1.0;
+
+
+        musicSelector.addEventListener('change', () => {
+        bgMusic.pause();
+        bgMusic = new Audio(musicSelector.value);
+        bgMusic.loop = true;
+        bgMusic.volume = 1.0;
+            if (gameRunning || gameStarted) {
+                bgMusic.play().catch(err => console.log('Autoplay blocked:', err));
+    }
+});
+
         const flapSound = new Audio('huh.mp3');  
         const hitSound = new Audio('laugh.mp3');     
         const scoreSound = new Audio('yipee.mp3'); 
@@ -143,23 +191,9 @@
         const pipeSpeed = 2;
 
         function drawBird() {
-            ctx.fillStyle = '#ffd700';
-            ctx.beginPath();
-            ctx.arc(bird.x + bird.width/2, bird.y + bird.height/2, bird.width/2, 0, Math.PI * 2);
-            ctx.fill();
-            
-            ctx.fillStyle = '#ff6b6b';
-            ctx.beginPath();
-            ctx.moveTo(bird.x + bird.width, bird.y + bird.height/2);
-            ctx.lineTo(bird.x + bird.width + 10, bird.y + bird.height/2 - 5);
-            ctx.lineTo(bird.x + bird.width + 10, bird.y + bird.height/2 + 5);
-            ctx.fill();
-            
-            ctx.fillStyle = '#000';
-            ctx.beginPath();
-            ctx.arc(bird.x + bird.width/2 + 8, bird.y + bird.height/2 - 4, 4, 0, Math.PI * 2);
-            ctx.fill();
-        }
+    ctx.drawImage(birdImg, bird.x, bird.y, bird.width, bird.height);
+}
+
 
         function drawPipes() {
             ctx.fillStyle = '#2ecc71';
@@ -329,6 +363,7 @@
     </script>
 </body>
 </html>
+
 
 
 
