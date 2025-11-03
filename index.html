@@ -18,21 +18,19 @@
             min-height: 100vh;
             background: linear-gradient(to bottom, #4ec0ca 0%, #87ceeb 100%);
             font-family: 'Arial', sans-serif;
-            overflow: hidden;
-        }
-
-        .game-container {
-            text-align: center;
+            transition: background 2s ease; /* smooth color change */
         }
 
         canvas {
-            border: 3px solid #333;
-            border-radius: 10px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
-            background: #70c5ce;
-            display: block;
-            margin: 0 auto;
+        border: 3px solid #333;
+        border-radius: 10px;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+        background: linear-gradient(to bottom, #9be2fe, #67d1fb); /* soft sky */
+        display: block;
+        margin: 0 auto;
+        transition: background 2s ease; /* smooth transitions */
         }
+
 
         .score {
             font-size: 48px;
@@ -232,6 +230,39 @@
         let gameRunning = false;
         let gameStarted = false;
         let frameCount = 0;
+        // Function to smoothly change background over time
+        function updateBackground() {
+        const colors = [
+        { body: "#4ec0ca", canvas: "#9be2fe" }, // morning
+        { body: "#87ceeb", canvas: "#67d1fb" }, // noon
+        { body: "#f5a623", canvas: "#fbd786" }, // evening
+        { body: "#1e3c72", canvas: "#2a5298" }, // night
+    ];
+
+            // pick a color set based on frameCount
+        const index = Math.floor((frameCount / 400) % colors.length);
+        const nextIndex = (index + 1) % colors.length;
+
+    // progress between colors
+        const t = (frameCount % 400) / 400;
+
+    // smooth color blend
+        function blend(c1, c2, t) {
+            const n1 = parseInt(c1.slice(1), 16);
+            const n2 = parseInt(c2.slice(1), 16);
+            const r = Math.floor(((n1 >> 16) * (1 - t)) + ((n2 >> 16) * t));
+            const g = Math.floor((((n1 >> 8) & 0xff) * (1 - t)) + (((n2 >> 8) & 0xff) * t));
+            const b = Math.floor(((n1 & 0xff) * (1 - t)) + ((n2 & 0xff) * t));
+        return `rgb(${r}, ${g}, ${b})`;
+    }
+
+        const blendedBody = blend(colors[index].body, colors[nextIndex].body, t);
+        const blendedCanvas = blend(colors[index].canvas, colors[nextIndex].canvas, t);
+
+    document.body.style.background = `linear-gradient(to bottom, ${blendedBody}, ${blendedCanvas})`;
+    canvas.style.background = `linear-gradient(to bottom, ${blendedCanvas}, ${blendedBody})`;
+}
+
 
         const pipeWidth = 60;
         const pipeGap = 180;
@@ -340,6 +371,9 @@
                 updatePipes();
                 frameCount++;
             }
+           
+            updateBackground();
+
             draw();
             if (frameCount > 10000) frameCount = 0;
             requestAnimationFrame(gameLoop);
